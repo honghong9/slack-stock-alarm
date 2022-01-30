@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 
 @Slf4j
 @Service("stockService")
-public class YahooFinancialService implements StockService {
+public class YahooFinancialStockService implements StockService {
 
     public Stock getStockInfo(String stockSymbol) {
         Stock stock = null;
@@ -24,7 +24,7 @@ public class YahooFinancialService implements StockService {
 //            log.info("##### Current Quote: " + stock.getQuote().getPrice());
 //            log.info("##### Currency: " + stock.getCurrency());
 
-            stock.print();
+//            stock.print();
 
             return stock;
         } catch (IOException e) {
@@ -34,17 +34,8 @@ public class YahooFinancialService implements StockService {
         return null;
     }
 
+    @Override
     public BigDecimal getCurrentQuote(String stockSymbol) {
         return getStockInfo(stockSymbol).getQuote().getPrice();
-    }
-
-    @Override
-    public Stock isQuoteLowerThan(String stockSymbol, BigDecimal targetQuote) {
-        return null;
-    }
-
-    @Override
-    public Stock isQuoteHigherThan(String stockSymbol, BigDecimal targetQuote) {
-        return null;
     }
 }

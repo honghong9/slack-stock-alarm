@@ -13,6 +13,7 @@ import org.springframework.util.ObjectUtils;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
+// to study which way is better to communicate with App.
 public class DefaultMessageHandler implements BoltEventHandler<MessageEvent> {
 
     private final Pattern stockPattern = Pattern.compile("^.*" + Pattern.quote("stock") + ".*$");
