@@ -6,7 +6,6 @@ import com.slack.api.bolt.handler.builtin.SlashCommandHandler;
 import com.slack.api.model.event.AppHomeOpenedEvent;
 import kr.slack.integration.action.MyBlockActionHandler;
 import kr.slack.integration.command.handler.HelloCommandHandler;
-import kr.slack.integration.command.handler.SearchCommandHandler;
 import kr.slack.integration.event.handler.AppHomeOpenedEventHandler;
 import kr.slack.integration.event.handler.DefaultMessageHandler;
 import kr.slack.integration.middleware.ResponseDebugMiddleware;
@@ -53,8 +52,6 @@ public class SlackApp {
     app.command("/hello", new HelloCommandHandler());
 
     app.command("/stock", stockCommandHandler);
-
-    app.command("/my-search", new SearchCommandHandler());
 
     // action handlers
     app.blockAction("approve_button", new MyBlockActionHandler());

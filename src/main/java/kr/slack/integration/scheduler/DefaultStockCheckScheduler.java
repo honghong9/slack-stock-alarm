@@ -7,6 +7,7 @@ import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import kr.slack.integration.domain.AlarmRequest;
 import kr.slack.integration.service.StockService;
 import kr.slack.integration.service.impl.AlarmRequestService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,8 +16,9 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.math.BigDecimal;
 
+@Slf4j
 @Component
-public class DefaultScheduler {
+public class DefaultStockCheckScheduler {
 
    private String ENV_SLACK_BOT_TOKEN;
 
@@ -26,7 +28,7 @@ public class DefaultScheduler {
    private final StockService stockService;
    private final AlarmRequestService alarmRequestService;
 
-   public DefaultScheduler(StockService stockService, AlarmRequestService alarmRequestService) {
+   public DefaultStockCheckScheduler(StockService stockService, AlarmRequestService alarmRequestService) {
       this.stockService = stockService;
       this.alarmRequestService = alarmRequestService;
       ENV_SLACK_BOT_TOKEN = System.getenv("SLACK_BOT_TOKEN");
@@ -34,7 +36,9 @@ public class DefaultScheduler {
 
    @Scheduled(fixedDelay = 10000, initialDelay = 10000)
    public void checkQuoteAndNotify() {
-      // fetch all the alarm requests
+
+      log.info("##### checkQuoteAndNotify() in");
+      // fetch all the not processed alarm requests
       try {
          process();
       } catch (SlackApiException e) {

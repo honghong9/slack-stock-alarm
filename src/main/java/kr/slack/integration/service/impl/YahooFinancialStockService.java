@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 
 @Slf4j
 @Service("stockService")
-public class YahooFinancialService implements StockService {
+public class YahooFinancialStockService implements StockService {
 
     public Stock getStockInfo(String stockSymbol) {
         Stock stock = null;

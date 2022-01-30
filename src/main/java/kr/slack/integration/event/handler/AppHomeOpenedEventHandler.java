@@ -33,10 +33,10 @@ public class AppHomeOpenedEventHandler implements BoltEventHandler<AppHomeOpened
                 .blocks(asBlocks(
                         section(section -> section.text(markdownText(mt -> mt.text("*Welcome to MyStockTracking* :tada:")))),
                         divider(),
-                        section(section -> section.text(markdownText(mt -> mt.text("This button won't do much for now but you can set up a listener for it using the `actions()` method and passing its unique `action_id`. See an example on <https://slack.dev/java-slack-sdk/guides/interactive-components|slack.dev/java-slack-sdk>.")))),
+                        section(section -> section.text(markdownText(mt -> mt.text("You can be notified when a stock price gets a certain value.")))),
                         actions(actions -> actions
                                 .elements(asElements(
-                                        button(b -> b.text(plainText(pt -> pt.text("Click me!"))).value("button1").actionId("button_1"))
+                                        button(b -> b.text(plainText(pt -> pt.text("Click me!"))).value("button").actionId("button_1"))
                                 ))
                         )
                 ))
