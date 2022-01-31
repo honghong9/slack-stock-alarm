@@ -14,23 +14,12 @@ import java.math.BigDecimal;
 public class YahooFinancialStockService implements StockService {
 
     public Stock getStockInfo(String stockSymbol) {
-        Stock stock = null;
         try {
-            stock = YahooFinance.get(stockSymbol);
-//            log.info("##### Name: " + stock.getName());
-//            log.info("##### Symbol: " + stock.getSymbol());
-//            log.info("##### StockExchange: " + stock.getStockExchange());
-//            log.info("##### Quote: " + stock.getQuote().toString());
-//            log.info("##### Current Quote: " + stock.getQuote().getPrice());
-//            log.info("##### Currency: " + stock.getCurrency());
-
-//            stock.print();
-
-            return stock;
+            return YahooFinance.get(stockSymbol);
         } catch (IOException e) {
             e.printStackTrace();
+            log.error("Error in getting stock info from Yahoo Finance");
         }
-
         return null;
     }
 
