@@ -8,6 +8,7 @@ import com.slack.api.methods.SlackApiException;
 
 import java.io.IOException;
 
+// not used
 public class MyBlockActionHandler implements BlockActionHandler {
 
     @Override

@@ -5,7 +5,6 @@ import com.slack.api.bolt.handler.builtin.SlashCommandHandler;
 import com.slack.api.bolt.request.builtin.SlashCommandRequest;
 import com.slack.api.bolt.response.Response;
 import com.slack.api.methods.SlackApiException;
-import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import com.slack.api.webhook.WebhookResponse;
 import kr.slack.integration.service.StockService;
 import kr.slack.integration.service.impl.AlarmRequestService;
@@ -15,6 +14,12 @@ import yahoofinance.Stock;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+
+import static com.slack.api.model.block.Blocks.*;
+import static com.slack.api.model.block.composition.BlockCompositions.markdownText;
+import static com.slack.api.model.block.composition.BlockCompositions.plainText;
+import static com.slack.api.model.block.element.BlockElements.asElements;
+import static com.slack.api.model.block.element.BlockElements.button;
 
 @Slf4j
 @Component
@@ -37,7 +42,7 @@ public class StockCommandHandler implements SlashCommandHandler {
 
         if (args.length == 1) {
             // assume that the command is to get the stock information
-            returnStockInfo(args[0], slashCommandRequest, context);
+            responseStockInfo(args[0], slashCommandRequest, context);
         } else if (args.length == 2) {
             // assume that the command is to set the alarm with price
             createAlarmRequest(args[0], args[1], slashCommandRequest, context);
@@ -48,14 +53,25 @@ public class StockCommandHandler implements SlashCommandHandler {
         return context.ack();
     }
 
-    private void returnStockInfo(String stockSymbol, SlashCommandRequest slashCommandRequest, SlashCommandContext context) throws IOException {
+    private void responseStockInfo(String stockSymbol, SlashCommandRequest slashCommandRequest, SlashCommandContext context) throws IOException {
 
         // TODO - check the stockSymbol is valid
         Stock stock = stockService.getStockInfo(stockSymbol);
 
         WebhookResponse result = context.respond(res -> res
                 .responseType("in_channel")
-                .text(stock.toString())
+                .blocks(asBlocks(
+                        section(section -> section.text(markdownText(mt -> mt.text(
+                                "The current quote of the stock, *" + stockSymbol + "*, is " + stock.getQuote().getPrice())))
+                        ),
+                        section(section -> section.text(markdownText(mt -> mt.text(
+                                "For the stock detail, please click the following button.")))),
+                        actions(actions -> actions.elements(asElements(
+                                button(b -> b.text(plainText(pt -> pt.text("Detail on " + stockSymbol))).url("https://finance.yahoo.com/quote/" + stockSymbol))))
+                        ),
+                        divider()
+                        )
+                )
         );
     }
 
@@ -64,53 +80,28 @@ public class StockCommandHandler implements SlashCommandHandler {
         BigDecimal originalQuote = stockService.getCurrentQuote(stockSymbol);
         BigDecimal targetQuote = new BigDecimal(target);
 
+        // TODO - validate the quotes to check if it is ok to create an alarm
+
         alarmRequestService.createAlarmRequest(context.getTeamId(), context.getChannelId(), context.getRequestUserId(), context.getResponseUrl(), stockSymbol, originalQuote, targetQuote);
 
-//        WebhookResponse result = context.respond(res -> res
-//                .responseType("in_channel")
-//                .text("You will be notified when the quote of " + stockSymbol + " gets " + target)
-//        );
-
-        ChatPostMessageResponse response = context.say("You will be notified when the quote of " + stockSymbol + " gets " + target);
-    }
-
-    private void temp() {
-//        app.command("/hello2", (req, ctx) -> {
-//            // ctx.client() holds a valid bot token
-//            ChatPostMessageResponse response = ctx.client().chatPostMessage(r -> r
-//                    .channel(ctx.getChannelId())
-//                    .text(":wave: How are you?")
-//            );
-//            return ctx.ack();
-//        });
-//
-//        app.command("/hello3", (req, ctx) -> {
-//            ChatPostMessageResponse response = ctx.say(":wave: How are you?");
-//            return ctx.ack();
-//        });
-//
-//        app.command("/weather", (req, ctx) -> {
-//            String keyword = req.getPayload().getText();
-//            String userId = req.getPayload().getUserId();
-//            ctx.logger.info("Weather search by keyword: {} for user: {}", keyword, userId);
-//            return ctx.ack("Weather search by keyword: " + keyword + " for user: " + userId);
-//        });
-
-//
-//        app.command("/ping2", (req, ctx) -> {
-//            return ctx.ack(asBlocks(
-//                    section(section -> section.text(markdownText(":wave: pong"))),
-//                    actions(actions -> actions
-//                            .elements(asElements(
-//                                    button(b -> b.actionId("ping-again").text(plainText(pt -> pt.text("Ping"))).value("ping"))
-//                            ))
-//                    )
-//            ));
-//        });
-//
-//        app.command("/ping3", (req, ctx) -> {
-//            return ctx.ack(res -> res.responseType("in_channel").text(":wave: pong"));
-//        });
+        WebhookResponse result = context.respond(res -> res
+                .responseType("in_channel")
+                .blocks(asBlocks(
+                                section(section -> section.text(markdownText(mt -> mt.text(
+                                        "Thanks for setting the alarm for *" + stockSymbol + "*. " +
+                                        "You will get notified when the quote gets " + target)))
+                                ),
+                                section(section -> section.text(markdownText(mt -> mt.text(
+                                        "For the stock detail, please click the following button.")))),
+                                actions(actions -> actions.elements(asElements(
+                                        button(b -> b.text(plainText(pt -> pt.text("Detail on " + stockSymbol))).url("https://finance.yahoo.com/quote/" + stockSymbol)))
+                                        )
+                                ),
+                                divider()
+                        )
+                )
+        );
+//        ChatPostMessageResponse response = context.say("You will be notified when the quote of " + stockSymbol + " gets " + target);
     }
 }
 
